@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Elena G. de White - Chat de Consulta y Citas</title>
+    <script src="config.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
@@ -514,15 +515,29 @@
             return div;
         }
 
+        function getApiBase() {
+            const base = String(window.APP_CONFIG?.WORKER_API_BASE || '').trim().replace(/\/+$/, '');
+            if (!base || base.includes('TU-WORKER') || base.includes('TU-SUBDOMINIO')) {
+                throw new Error('Falta configurar WORKER_API_BASE en frontend/config.js con la URL de tu Cloudflare Worker.');
+            }
+            return base;
+        }
+
         async function fetchEGWResponse(userPrompt) {
-            const response = await fetch('/api/chat', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    prompt: userPrompt,
-                    history: chatHistory.slice(-20)
-                })
-            });
+            const apiBase = getApiBase();
+            let response;
+            try {
+                response = await fetch(`${apiBase}/api/chat`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        prompt: userPrompt,
+                        history: chatHistory.slice(-20)
+                    })
+                });
+            } catch (_) {
+                throw new Error('No se pudo conectar con el servidor de consultas. Revisa la URL del Worker y la configuración de CORS.');
+            }
 
             let result = {};
             try {

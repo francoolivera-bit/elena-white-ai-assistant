@@ -1,0 +1,15 @@
+{
+  "name": "elena-white-ai-api",
+  "version": "3.0.0",
+  "private": true,
+  "description": "Cloudflare Worker que protege GEMINI_API_KEY para el asistente de Elena G. de White.",
+  "type": "module",
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy",
+    "check": "wrangler deploy --dry-run --outdir .wrangler/dry-run"
+  },
+  "devDependencies": {
+    "wrangler": "^4.148.0"
+  }
+}
